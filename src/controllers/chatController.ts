@@ -56,11 +56,11 @@ export const deleteChat = async (req: Request, res: Response) => {
 
 export const updateChat = async (req: Request, res: Response) => {
   const { chatId } = req.params;
-  const { userId, endTime, settings } = req.body;
+  const { userId, endTime, settings, llmSettings, sttSettings } = req.body;
   try {
     const chat = await prisma.chat.update({
       where: { id: chatId },
-      data: { userId, endTime, settings },
+      data: { userId, endTime, settings, llmSettings, sttSettings },
     });
     res.json(chat);
   } catch (err) {

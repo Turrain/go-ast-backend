@@ -32,18 +32,23 @@ model Chat {
   endTime   DateTime?
   messages  Message[]
   settings Json?
-}
 
+  sttSettings Json?
+  llmSettings Json?
+  ttsSettings Json?
+
+}
+ 
 model Message {
   id        Int       @id @default(autoincrement())
   chat      Chat      @relation(fields: [chatId], references: [id])
   chatId    String
-  sender    Sender
+  role      Sender
   content   String
   sentAt    DateTime  @default(now())
 }
 
 enum Sender {
-  User
-  LLM
+  user
+  assistant
 }

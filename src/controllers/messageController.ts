@@ -5,10 +5,10 @@ import { PrismaClient, Sender } from '@prisma/client';
 const prisma = new PrismaClient();
 
 export const sendMessage = async (req: Request, res: Response) => {
-  const { chatId, sender, content } = req.body;
+  const { chatId, role, content } = req.body;
   try {
     const message = await prisma.message.create({
-      data: { chatId, sender: sender as Sender, content },
+      data: { chatId, role: role, content },
     });
     res.json(message);
   } catch (err) {
