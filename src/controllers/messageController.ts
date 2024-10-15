@@ -19,6 +19,20 @@ export const sendMessage = async (req: Request, res: Response) => {
   }
 };
 
+export const clearMessages = async (req: Request, res: Response) => {
+  const { chatId } = req.params;
+  try {
+      await prisma.message.deleteMany({
+          where: { chatId },
+      });
+      // Emit event for real-time updates
+      req.app.get('io').to(chatId).emit('clearMessages');
+      res.json({ message: 'All messages cleared successfully' });
+  } catch (err) {
+      res.status(500).json({ error: 'Failed to clear messages' });
+  }
+};
+
 export const getMessages = async (req: Request, res: Response) => {
   const { chatId } = req.params;
   try {
