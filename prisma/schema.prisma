@@ -32,7 +32,8 @@ model Chat {
   endTime   DateTime?
   messages  Message[]
   settings Json?
-
+  title String?
+  
   sttSettings Json?
   llmSettings Json?
   ttsSettings Json?
