@@ -20,6 +20,9 @@ export const listChats = async (req: Request, res: Response) => {
   try {
     const chats = await prisma.chat.findMany({
       include: { messages: true },
+      orderBy: {
+        startTime: 'desc',
+      },
     });
     res.json(chats);
   } catch (err) {

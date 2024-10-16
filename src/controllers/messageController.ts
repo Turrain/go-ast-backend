@@ -6,6 +6,7 @@ const prisma = new PrismaClient();
 
 export const sendMessage = async (req: Request, res: Response) => {
   const { chatId, role, content } = req.body;
+  console.log('Received message:', { chatId, role, content });
   try {
     const message = await prisma.message.create({
       data: { chatId, role, content },
