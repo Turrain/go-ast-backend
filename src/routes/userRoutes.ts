@@ -1,10 +1,13 @@
-// src/routes/userRoutes.ts
 import express from 'express';
-import { createUser, listUsers } from '../controllers/userController';
+import {  listUsers, registerUser, loginUser, logoutUser, getMe } from '../controllers/userController';
+import authMiddleware from '../middleware/auth';
 
 const router = express.Router();
 
-router.post('/', createUser);
+router.post('/register', registerUser);
+router.post('/login', loginUser);
+router.post('/logout', authMiddleware, logoutUser);
 router.get('/', listUsers);
+router.get('/me', authMiddleware, getMe);
 
 export default router;

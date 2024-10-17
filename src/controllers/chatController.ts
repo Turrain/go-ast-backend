@@ -1,14 +1,16 @@
 // src/controllers/chatController.ts
 import { Request, Response } from 'express';
 import { PrismaClient } from '@prisma/client';
+import { AuthRequest } from '../middleware/auth';
 
 const prisma = new PrismaClient();
 
-export const startChat = async (req: Request, res: Response) => {
-  const { userId } = req.body;
+export const startChat = async (req: AuthRequest, res: Response) => {
+  const { id } = req.user;
+  console.log("userId", id);
   try {
     const chat = await prisma.chat.create({
-      data: { userId },
+      data: { userId: id },
     });
     res.json(chat);
   } catch (err) {
@@ -16,9 +18,11 @@ export const startChat = async (req: Request, res: Response) => {
   }
 };
 
-export const listChats = async (req: Request, res: Response) => {
+export const listChats = async (req: AuthRequest, res: Response) => {
+  const { id } = req.user;
   try {
     const chats = await prisma.chat.findMany({
+      where: { userId: id },
       include: { messages: true },
       orderBy: {
         startTime: 'desc',
@@ -30,11 +34,12 @@ export const listChats = async (req: Request, res: Response) => {
   }
 };
 
-export const deleteChat = async (req: Request, res: Response) => {
+export const deleteChat = async (req: AuthRequest, res: Response) => {
   const { chatId } = req.params;
+  const { id } = req.user;
   try {
     const chat = await prisma.chat.findUnique({
-      where: { id: chatId },
+      where: { id: chatId, userId: id },
     });
     if (!chat) {
       return res.status(404).json({ error: 'Chat not found' });
@@ -57,13 +62,15 @@ export const deleteChat = async (req: Request, res: Response) => {
   }
 };
 
-export const updateChat = async (req: Request, res: Response) => {
+export const updateChat = async (req: AuthRequest, res: Response) => {
+
   const { chatId } = req.params;
-  const { userId, endTime, settings, llmSettings, sttSettings,title } = req.body;
+  const {endTime, settings, llmSettings, sttSettings,title } = req.body;
+  const { id } = req.user;
   try {
     const chat = await prisma.chat.update({
-      where: { id: chatId },
-      data: { userId, endTime, settings, llmSettings, sttSettings, title },
+      where: { id: chatId, userId: id },
+      data: { endTime, settings, llmSettings, sttSettings, title },
     });
     res.json(chat);
   } catch (err) {
@@ -73,6 +80,7 @@ export const updateChat = async (req: Request, res: Response) => {
 
 export const getChat = async (req: Request, res: Response) => {
   const { chatId } = req.params;
+
   try {
     const chat = await prisma.chat.findUnique({
       where: { id: chatId },

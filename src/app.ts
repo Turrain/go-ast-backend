@@ -13,6 +13,7 @@ import ollamaRoutes from "./routes/ollamaRoutes";
 import asteriskRoutes from "./routes/asteriskRoutes";
 import { Server } from "socket.io";
 import settingsRoutes from "./routes/settingsRoutes";
+import authMiddleware from "./middleware/auth";
 
 const app = express();
 const prisma = new PrismaClient();
@@ -77,7 +78,6 @@ const createDefaultUser = async () => {
   if (!defaultUser) {
     await prisma.user.create({
       data: {
-        username: 'defaultuser',
         email: 'default@example.com',
         password: 'defaultpassword', // Consider hashing passwords
       },

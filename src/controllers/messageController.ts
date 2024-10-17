@@ -1,15 +1,18 @@
 // src/controllers/messageController.ts
 import { Request, Response } from 'express';
 import { PrismaClient, Sender } from '@prisma/client';
+import { AuthRequest } from '../middleware/auth';
 
 const prisma = new PrismaClient();
 
 export const sendMessage = async (req: Request, res: Response) => {
   const { chatId, role, content } = req.body;
+  
   console.log('Received message:', { chatId, role, content });
   try {
     const message = await prisma.message.create({
       data: { chatId, role, content },
+      
     });
     // Emit event for real-time updates
     req.app.get('io').to(chatId).emit('newMessage', message);
@@ -20,7 +23,7 @@ export const sendMessage = async (req: Request, res: Response) => {
   }
 };
 
-export const clearMessages = async (req: Request, res: Response) => {
+export const clearMessages = async (req: AuthRequest, res: Response) => {
   const { chatId } = req.params;
   try {
       await prisma.message.deleteMany({
@@ -34,7 +37,7 @@ export const clearMessages = async (req: Request, res: Response) => {
   }
 };
 
-export const getMessages = async (req: Request, res: Response) => {
+export const getMessages = async (req: AuthRequest, res: Response) => {
   const { chatId } = req.params;
   try {
     const messages = await prisma.message.findMany({
@@ -47,7 +50,7 @@ export const getMessages = async (req: Request, res: Response) => {
   }
 };
 
-export const updateMessage = async (req: Request, res: Response) => {
+export const updateMessage = async (req: AuthRequest, res: Response) => {
   const { messageId } = req.params;
   const { content } = req.body;
   try {
@@ -63,7 +66,7 @@ export const updateMessage = async (req: Request, res: Response) => {
   }
 };
 
-export const deleteMessage = async (req: Request, res: Response) => {
+export const deleteMessage = async (req: AuthRequest, res: Response) => {
   const { messageId } = req.params;
   try {
     const message = await prisma.message.findUnique({
